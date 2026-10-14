@@ -6,6 +6,34 @@ A practical, self-hosted **n8n workflow system** for tracking freelance applicat
 
 > **Project status:** The primary email tracker and follow-up reminders workflows have been published. A follow-up reminder was delivered to Gmail, its reminder date was updated in Google Sheets, and a subsequent run correctly found no eligible duplicate reminder. The global error handler was separately tested and attached to the follow-up workflow. These tests validate the demonstrated paths, **not every possible incoming email or future scheduled run**.
 
+## Portfolio visuals
+
+The following are **illustrative portfolio diagrams**, not screenshots captured from a live n8n execution or Gmail session. They summarize the published automation architecture; the source-of-truth workflow definitions are the sanitized JSON files in [`workflows/`](workflows/). The example email and spreadsheet use demonstration data.
+
+### Freelance Email Tracker
+
+![Illustrated freelance email tracker workflow](docs/screenshots/01-email-tracker-corrected.png)
+
+*Email intake, application matching, Google Sheets status updates, and manual-review routing. Simplified illustration; see the exported workflow for all nodes and branches.*
+
+### Follow-up Reminders
+
+![Illustrated follow-up reminders workflow](docs/screenshots/02-follow-up-reminders-corrected.png)
+
+*Daily 9:00 AM Paraguay check, 7-day follow-up eligibility, Gmail reminder to the tracker owner, and reminder-date write-back.*
+
+### Global Error Handler
+
+![Illustrated global error handler workflow](docs/screenshots/03-global-error-handler-corrected.png)
+
+*Reusable n8n error trigger connected to Gmail notifications.*
+
+### Reminder delivery and sheet update
+
+![Illustrative reminder email and spreadsheet results](docs/screenshots/04-reminder-results-corrected.png)
+
+*Sanitized visualization of the tested reminder-to-spreadsheet flow. For what was actually verified in n8n and Gmail, see [Test evidence](#test-evidence).*
+
 ## What it does
 
 - **Tracks application-related emails:** A Gmail trigger polls for new messages and processes them against a Google Sheets-based application register.
@@ -186,15 +214,9 @@ The following results were observed during the project's guided tests:
 
 **Evidence scope:** These observations validate the demonstrated test path. Scheduled delivery at every future 9:00 AM run, every category of incoming email, failure/retry semantics, and every workflow's error-handler attachment have not all been independently verified.
 
-### Suggested screenshots for a public portfolio
+### Additional evidence screenshots (future enhancement)
 
-Store screenshots (with email addresses, OAuth IDs, client details, and other private data redacted) under an optional `docs/screenshots/` directory:
-
-- Workflow canvas for the email tracker
-- Follow-up workflow showing all five successful nodes
-- Google Sheets application register with synthetic records
-- Example reminder email with synthetic recipient information
-- Error-handler workflow and a redacted alert
+Four **illustrative** portfolio graphics are already in `docs/screenshots/` and displayed above. For stronger independently verifiable evidence, add genuine screen captures from the n8n editor and execution history, plus redacted Gmail and Google Sheets test results. Remove or blur any email addresses, OAuth IDs, live URLs, tokens, private messages, and client information before uploading. Clearly label live captures as screenshots and illustrations as diagrams.
 
 ## Security and privacy
 
@@ -231,13 +253,19 @@ The following files are published:
 ```text
 n8n-freelance-application-tracker/
 ├── README.md
-└── workflows/
-    ├── email-tracker.json
-    ├── follow-up-reminders-sanitized.json
-    └── global-error-handler.json
+├── workflows/
+│   ├── email-tracker.json
+│   ├── follow-up-reminders-sanitized.json
+│   └── global-error-handler.json
+└── docs/
+    └── screenshots/
+        ├── 01-email-tracker-corrected.png
+        ├── 02-follow-up-reminders-corrected.png
+        ├── 03-global-error-handler-corrected.png
+        └── 04-reminder-results-corrected.png
 ```
 
-Potential future additions include synthetic sample data under `examples/` and sanitized screenshots under `docs/screenshots/`.
+A potential future addition is synthetic sample data under `examples/`, along with genuine redacted screenshots of execution evidence.
 
 ## Portfolio summary
 
@@ -249,4 +277,4 @@ Potential future additions include synthetic sample data under `examples/` and s
 
 ---
 
-*Built as an automation portfolio demonstration. Replace the sample data and add sanitized workflow exports before sharing the repository publicly.*
+*Built as an automation portfolio demonstration. Workflow exports are sanitized templates; reconnect your own accounts and review the data before using them.*
