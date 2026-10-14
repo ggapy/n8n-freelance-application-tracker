@@ -149,12 +149,12 @@ For comprehensive coverage, inspect and set the Error Workflow on the primary Em
 
 ## Setup guide
 
-This repository README documents the observed system. To reproduce it, you will also need the **n8n workflow export JSON files** (not yet included here), configured Google credentials, and a Google spreadsheet with the required headers.
+The three sanitized n8n workflow JSON exports are included in the [`workflows/`](workflows/) folder. To reproduce this project, you will need your own Google credentials and a Google spreadsheet with the required headers. These templates are inactive and their account-specific resource selectors have been cleared.
 
 1. **Prepare n8n.** Run a recent n8n release, preferably on HTTPS with a durable backing database. Set the instance/workflow timezone to `America/Asuncion`.
 2. **Prepare Google Sheets.** Create the `Applications` and `Needs Review` tabs. Add the seven headers listed in the data model section.
 3. **Configure Google credentials.** Connect Google Sheets and Gmail in n8n using your own authorized Google account and OAuth configuration.
-4. **Import or recreate the workflows.** Use the workflow exports when available, reconnect credentials, and select your spreadsheet and sheet names. Do not assume Google resource IDs will match another environment.
+4. **Import the workflows.** Import the three JSON files from the `workflows/` folder, reconnect credentials, set the notification recipient, and select your spreadsheet and sheet names on every Google Sheets node. Reassign the Global Error Handler in workflow settings, since internal workflow IDs are stripped. Do not assume resource IDs will match another environment.
 5. **Configure the Gmail exclusions.** Enter the three `-subject:` clauses in the incoming Gmail Trigger's Search field.
 6. **Configure reminders.** Set the daily 9:00 AM trigger, use the seven-day eligibility logic, and map `Application ID` and `Reminder` correctly in the Google Sheets update node.
 7. **Connect error handling.** Assign `n8n - Global Error Handler` in each intended workflow's Error Workflow settings.
@@ -224,22 +224,20 @@ Store screenshots (with email addresses, OAuth IDs, client details, and other pr
 - Export and version all three workflows, with sanitized fixtures and repeatable test cases.
 - Add operational alerts for missed scheduled executions as well as hard failures.
 
-## Suggested repository layout
+## Repository layout
 
-The following is a **recommended future structure**, not a claim that all files have already been created:
+The following files are published:
 
 ```text
-freelance-application-tracker/
+n8n-freelance-application-tracker/
 ├── README.md
-├── workflows/
-│   ├── email-tracker.json
-│   ├── follow-up-reminders.json
-│   └── global-error-handler.json
-├── examples/
-│   └── sample-applications.csv
-└── docs/
-    └── screenshots/
+└── workflows/
+    ├── email-tracker.json
+    ├── follow-up-reminders-sanitized.json
+    └── global-error-handler.json
 ```
+
+Potential future additions include synthetic sample data under `examples/` and sanitized screenshots under `docs/screenshots/`.
 
 ## Portfolio summary
 
