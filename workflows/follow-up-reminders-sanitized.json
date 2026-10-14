@@ -1,0 +1,256 @@
+{
+  "name": "n8n Portfolio - Freelance Follow-up Reminders",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -704,
+        -16
+      ],
+      "id": "913a3594-8515-4064-acfe-2dd1c46a36be",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "",
+          "mode": "list"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -448,
+        -16
+      ],
+      "id": "3f4bc729-7b09-4a4a-9499-7db9c3c04648",
+      "name": "Get row(s) in sheet",
+      "notes": "After importing, select your spreadsheet and its 'Applications' tab.",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst rows = $input.all();\nconst FOLLOW_UP_DAYS = 7;\n\nconst parts = new Intl.DateTimeFormat('en-GB', {\n  timeZone: 'America/Asuncion',\n  year: 'numeric',\n  month: '2-digit',\n  day: '2-digit'\n}).formatToParts(new Date());\n\nconst dateParts = Object.fromEntries(\n  parts.map(p => [p.type, p.value])\n);\n\nconst today = `${dateParts.year}-${dateParts.month}-${dateParts.day}`;\n\nfunction parseDate(value) {\n  const s = String(value ?? '').trim();\n  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(s)) return null;\n  const ms = Date.parse(s + 'T00:00:00Z');\n  if (!Number.isFinite(ms)) return null;\n  return new Date(ms).toISOString().slice(0, 10) === s\n    ? ms : null;\n}\n\nconst todayMs = parseDate(today);\nconst results = [];\n\nfor (const item of rows) {\n  const row = item.json;\n  const status = String(row['Status'] ?? '').trim().toLowerCase();\n\n  if (!['applied', 'interview'].includes(status)) continue;\n\n  const lastContact = parseDate(row['Last Contact']);\n  if (lastContact === null) continue;\n\n  const days = Math.floor((todayMs - lastContact) / 86400000);\n  if (days < FOLLOW_UP_DAYS) continue;\n\n  const reminderText = String(row['Reminder'] ?? '').trim();\n  const lastReminder = parseDate(reminderText);\n\n  // Skip records with an unrecognized nonempty reminder value.\n  if (reminderText && lastReminder === null) continue;\n\n  // Don't repeat a reminder for the same contact.\n  if (lastReminder !== null && lastReminder >= lastContact) continue;\n\n  results.push({\n    json: {\n      ...row,\n      daysSinceContact: days,\n      reminderDate: today\n    }\n  });\n}\n\nreturn results;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -224,
+        -16
+      ],
+      "id": "124c6a1b-9597-4318-9467-fc8ee521d11b",
+      "name": "Check Follow-up Eligibility"
+    },
+    {
+      "parameters": {
+        "sendTo": "your-email@example.com",
+        "subject": "=Follow-up Reminder - {{ $json[\"Application ID\"] }} - {{ $json[\"Client / Company\"] }}",
+        "emailType": "text",
+        "message": "=FREELANCE APPLICATION FOLLOW-UP  Application: {{ $json[\"Application ID\"] }} Company: {{ $json[\"Client / Company\"] }} Position: {{ $json[\"Project / Role\"] }}  Current Status: {{ $json[\"Status\"] }} Last Contact: {{ $json[\"Last Contact\"] }} Days Since Contact: {{ $json.daysSinceContact }}  This application is due for follow-up.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        -16
+      ],
+      "id": "bdb14b3d-2032-4cba-b3c2-68c10f32e4a2",
+      "name": "Send Follow-up Reminder"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Application ID": "={{ $('Check Follow-up Eligibility').item.json[\"Application ID\"] }}",
+            "Reminder": "={{ $('Check Follow-up Eligibility').item.json.reminderDate }}"
+          },
+          "matchingColumns": [
+            "Application ID"
+          ],
+          "schema": [
+            {
+              "id": "Application ID",
+              "displayName": "Application ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Client / Company",
+              "displayName": "Client / Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Project / Role",
+              "displayName": "Project / Role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Contact Info",
+              "displayName": "Contact Info",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Last Contact",
+              "displayName": "Last Contact",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Reminder",
+              "displayName": "Reminder",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        -16
+      ],
+      "id": "671a1cbb-f4c9-4728-aab6-16491bc25d76",
+      "name": "Update Reminder Date",
+      "notes": "After importing, select your spreadsheet and its 'Applications' tab.",
+      "notesInFlow": false
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Check Follow-up Eligibility",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Follow-up Eligibility": {
+      "main": [
+        [
+          {
+            "node": "Send Follow-up Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Follow-up Reminder": {
+      "main": [
+        [
+          {
+            "node": "Update Reminder Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "nodeGroups": [],
+  "tags": []
+}
