@@ -1,0 +1,55 @@
+{
+  "name": "n8n - Global Error Handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ba8f3596-eac2-43e4-8e41-1b21301fc975",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "sendTo": "your-email@example.com",
+        "subject": "=🚨 n8n ERROR - {{ $json.workflow?.name || 'Unknown workflow' }}",
+        "message": "=N8N WORKFLOW ERROR ALERT  Workflow: {{ $json.workflow?.name || 'Unknown' }}  Failed node: {{ $json.execution?.lastNodeExecuted || $json.trigger?.error?.node?.name || 'Unknown' }}  Error message: {{ $json.execution?.error?.message || $json.trigger?.error?.message || 'No error details available' }}  Execution link: {{ $json.execution?.url || 'Not available' }}  Alert time: {{ $now.setZone('America/Asuncion').toFormat('yyyy-MM-dd HH:mm:ss') }}  Please investigate the failed workflow.  Automated notification from your n8n VPS.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "d8e6f5a3-3a91-423d-952e-bc3a67ccee07",
+      "name": "Send Error Alert",
+      "notes": "After importing, select your Gmail credential and replace the example recipient email address.",
+      "notesInFlow": false
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send Error Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "nodeGroups": [],
+  "tags": []
+}
