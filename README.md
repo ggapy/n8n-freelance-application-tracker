@@ -214,9 +214,27 @@ The following results were observed during the project's guided tests:
 
 **Evidence scope:** These observations validate the demonstrated test path. Scheduled delivery at every future 9:00 AM run, every category of incoming email, failure/retry semantics, and every workflow's error-handler attachment have not all been independently verified.
 
-### Additional evidence screenshots (future enhancement)
+### Real execution evidence
 
-Four **illustrative** portfolio graphics are already in `docs/screenshots/` and displayed above. For stronger independently verifiable evidence, add genuine screen captures from the n8n editor and execution history, plus redacted Gmail and Google Sheets test results. Remove or blur any email addresses, OAuth IDs, live URLs, tokens, private messages, and client information before uploading. Clearly label live captures as screenshots and illustrations as diagrams.
+The two images below are **genuine captures from the working test**, formatted for this README. Unlike the [portfolio visuals](#portfolio-visuals), they are not generated illustrations.
+
+**Successful n8n workflow execution**
+
+![Real n8n follow-up workflow execution showing five successful nodes](docs/screenshots/05-real-n8n-execution-evidence.png)
+
+*October 2026 test: the workflow read six spreadsheet rows, identified one eligible application, ran the Gmail reminder step, and successfully ran the Google Sheets reminder-date update. All five n8n nodes display success.*
+
+**Delivered Gmail follow-up reminder**
+
+![Real Gmail follow-up reminder for APP-TEST-001 with sender identity redacted](docs/screenshots/06-real-gmail-reminder-evidence.png)
+
+*Genuine Gmail message received October 13, 2026 for test application `APP-TEST-001`. The original message reported eight days since last contact. The sender's name and email address have been redacted.*
+
+These screenshots document **one successful end-to-end test**, not a guarantee of continuous delivery or exactly-once execution. The actual five-node run and the displayed Gmail message together support the test evidence summarized above.
+
+### Future evidence improvements
+
+Add a genuine sanitized Google Sheets screenshot showing the `Reminder` column after an execution and, if desired, additional redacted execution-history screenshots. Remove any real customer details, email addresses, tokens, account identifiers, private links, or message contents before publishing.
 
 ## Security and privacy
 
@@ -262,7 +280,9 @@ n8n-freelance-application-tracker/
         ├── 01-email-tracker-corrected.png
         ├── 02-follow-up-reminders-corrected.png
         ├── 03-global-error-handler-corrected.png
-        └── 04-reminder-results-corrected.png
+        ├── 04-reminder-results-corrected.png
+        ├── 05-real-n8n-execution-evidence.png
+        └── 06-real-gmail-reminder-evidence.png
 ```
 
 A potential future addition is synthetic sample data under `examples/`, along with genuine redacted screenshots of execution evidence.
