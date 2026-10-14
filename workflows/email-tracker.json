@@ -1,0 +1,1485 @@
+{
+  "name": "n8n Portfolio - Freelance Email Tracker DEMO",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "maxResults": 1,
+        "filters": {
+          "q": "-subject:\"Freelance Tracker\" -subject:\"n8n ERROR\" -subject:\"Follow-up Reminder\""
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -832,
+        -336
+      ],
+      "id": "369c8b16-b9d8-49d2-8920-799bbdf3ea84",
+      "name": "Gmail Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4981f668-c9a9-47dc-9a50-8cd6caf916ad",
+              "name": "applicationId",
+              "value": "={{ ($('Gmail Trigger').first().json.Subject || '').match(/\\bAPP-\\d+\\b/i)?.[0]?.toUpperCase() || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "3db3a548-4488-48a5-b9ad-2c3dfbdcaaee",
+              "name": "senderEmail",
+              "value": "={{ (($('Gmail Trigger').first().json.From || '').match(/<([^>]+)>/)?.[1] || $('Gmail Trigger').first().json.From || '').toLowerCase().trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "31d17cdd-6304-470b-a074-ce293a4b6d3d",
+              "name": "detectedStatus",
+              "value": "={{ (() => {\n  const email = $('Gmail Trigger').first().json;\n  const text = `${email.subject || ''} ${email.snippet || ''}`.toLowerCase();\n\n  if (/\\b(reject(?:ed|ion)?|regret|not moving forward|unfortunately|unsuccessful)\\b/.test(text)) {\n    return 'Rejected';\n  }\n  if (/\\b(offer|accepted|hired)\\b/.test(text)) {\n    return 'Accepted';\n  }\n  if (/\\b(interview|schedule a call)\\b/.test(text)) {\n    return 'Interview';\n  }\n  return 'Needs Review';\n})() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -480,
+        416
+      ],
+      "id": "745c5280-f5ee-43ac-a352-ef37683c5b24",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Application ID": "={{ $json[\"Application ID\"] }}",
+            "Status": "={{ $json.detectedStatus }}",
+            "Last Contact": "={{ $now.toISODate() }}"
+          },
+          "matchingColumns": [
+            "Application ID"
+          ],
+          "schema": [
+            {
+              "id": "Application ID",
+              "displayName": "Application ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date Found",
+              "displayName": "Date Found",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Date Applied",
+              "displayName": "Date Applied",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Platform",
+              "displayName": "Platform",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Client / Company",
+              "displayName": "Client / Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Project / Role",
+              "displayName": "Project / Role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Job URL",
+              "displayName": "Job URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Work Type",
+              "displayName": "Work Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Proposed Rate",
+              "displayName": "Proposed Rate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Currency",
+              "displayName": "Currency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last Contact",
+              "displayName": "Last Contact",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Follow-up Date",
+              "displayName": "Follow-up Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Days Since Applied",
+              "displayName": "Days Since Applied",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Follow-up",
+              "displayName": "Follow-up",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Interview Date",
+              "displayName": "Interview Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Date Won",
+              "displayName": "Date Won",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Contract Value",
+              "displayName": "Contract Value",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Revenue Received",
+              "displayName": "Revenue Received",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Contact Person",
+              "displayName": "Contact Person",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Contact Info",
+              "displayName": "Contact Info",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Resume / Portfolio Used",
+              "displayName": "Resume / Portfolio Used",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        960,
+        -128
+      ],
+      "id": "dcda195f-be79-4726-9363-670a2abaed8a",
+      "name": "Update row in sheet",
+      "notes": "After importing, select your spreadsheet and its 'Applications' tab.",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0ffb28bd-7583-478f-9f6f-96c999d4739d",
+              "name": "detectedStatus",
+              "value": "={{\n(() => {\n  const gmail = $('Gmail Trigger').first().json;\n\n  const subject = String(\n    gmail.Subject ||\n    gmail.subject ||\n    ''\n  );\n\n  const snippet = String(\n    gmail.snippet ||\n    gmail.Snippet ||\n    ''\n  );\n\n  const text = `${subject} ${snippet}`.toLowerCase();\n\n  // --------------------------------\n  // 1. Interview / meeting / call\n  // --------------------------------\n  if (\n    text.includes('interview') ||\n    text.includes('schedule a call') ||\n    text.includes('schedule a meeting') ||\n    text.includes('invite you to a call') ||\n    text.includes('invite you to an interview') ||\n    text.includes('available to discuss') ||\n    text.includes('availability for a call') ||\n    text.includes('availability for an interview')\n  ) {\n    return 'Interview';\n  }\n\n  // --------------------------------\n  // 2. Offer\n  // --------------------------------\n  if (\n    text.includes('offer letter') ||\n    text.includes('job offer') ||\n    text.includes('offer you') ||\n    text.includes('pleased to offer') ||\n    text.includes('would like to offer')\n  ) {\n    return 'Offer';\n  }\n\n  // --------------------------------\n  // 3. Rejection\n  // --------------------------------\n  if (\n    text.includes('unfortunately') ||\n    text.includes('not moving forward') ||\n    text.includes('not proceed') ||\n    text.includes('other candidates') ||\n    text.includes('position has been filled') ||\n    text.includes('decided not to proceed') ||\n    text.includes('will not be moving forward')\n  ) {\n    return 'Rejected';\n  }\n\n  // --------------------------------\n  // 4. Meaningful reply\n  // --------------------------------\n  if (\n    text.includes('interested in your') ||\n    text.includes('interested in discussing') ||\n    text.includes('would like to discuss') ||\n    text.includes('would like to know more') ||\n    text.includes('please send') ||\n    text.includes('could you send') ||\n    text.includes('can you send') ||\n    text.includes('please provide') ||\n    text.includes('could you provide') ||\n    text.includes('can you provide') ||\n    text.includes('have some freelance work') ||\n    text.includes('project opportunity') ||\n    text.includes('next steps')\n  ) {\n    return 'Replied';\n  }\n\n  // --------------------------------\n  // 5. Everything else\n  // --------------------------------\n  return 'Other';\n})()\n}}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        512,
+        -112
+      ],
+      "id": "b3f7a7ca-302e-4072-af78-b669f98fcdaf",
+      "name": "Classify Email"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst rows = $input.all()\n  .map(item => item.json)\n  .filter(row =>\n    row &&\n    Object.keys(row).length > 0 &&\n    String(row['Application ID'] || '').trim()\n  );\n\nconst gmail = $('Gmail Trigger').first().json;\nconst prepared = $('Edit Fields').first().json;\n\nconst subject = String(gmail.Subject || '');\nconst snippet = String(gmail.snippet || '');\nconst emailText = `${subject} ${snippet}`;\n\nfunction normalize(value) {\n  return String(value || '')\n    .toLowerCase()\n    .replace(/[^a-z0-9\\s]/g, ' ')\n    .replace(/\\s+/g, ' ')\n    .trim();\n}\n\nfunction words(value) {\n  return normalize(value)\n    .split(' ')\n    .filter(word => word.length >= 4);\n}\n\nconst normalizedText = normalize(emailText);\nconst emailWords = new Set(words(emailText));\n\nfunction hasExactPhrase(value) {\n  const phrase = normalize(value);\n  return phrase &&\n    (` ${normalizedText} `).includes(` ${phrase} `);\n}\n\nconst scored = rows.map(row => {\n  const applicationId =\n    String(row['Application ID'] || '').trim();\n\n  const company = row['Client / Company'];\n  const role = row['Project / Role'];\n\n  let score = 0;\n  const reasons = [];\n\n  if (\n  prepared.applicationId &&\n  applicationId.toUpperCase() ===\n    String(prepared.applicationId).trim().toUpperCase()\n) {\n  score += 100;\n  reasons.push('application-id');\n}\n\n  const contactEmail = String(\n  row['Contact Info'] || ''\n).trim().toLowerCase();\n\nconst senderEmail = String(\n  prepared.senderEmail || ''\n).trim().toLowerCase();\n\nif (\n  senderEmail &&\n  contactEmail &&\n  senderEmail === contactEmail\n) {\n  score += 20;\n  reasons.push('sender-email');\n}\n  \n\n  if (hasExactPhrase(company)) {\n    score += 5;\n    reasons.push('company');\n  }\n\n  const roleWords = [...new Set(words(role))];\n\n  const matchedRoleWords = roleWords.filter(\n    word => emailWords.has(word)\n  );\n\n  score += matchedRoleWords.length;\n\n  if (matchedRoleWords.length) {\n    reasons.push(\n      `role:${matchedRoleWords.join(',')}`\n    );\n  }\n\n  return { row, score, reasons };\n});\n\nscored.sort((a, b) => b.score - a.score);\n\nconst best = scored[0];\nconst second = scored[1];\n\nlet safeMatch = false;\nlet matchReasons = '';\n\nif (!best) {\n  matchReasons = 'No candidate application found.';\n} else {\n  const exactId = best.reasons.includes('application-id');\n  const uniqueExactId = exactId &&\n    !scored.slice(1).some(candidate =>\n      candidate.reasons.includes('application-id')\n    );\n\n  const clearLead =\n    !second || best.score >= second.score + 2;\n\n  safeMatch =\n    uniqueExactId ||\n    (best.score >= 5 && clearLead);\n\n  matchReasons = best.reasons.join(', ');\n\n  if (!safeMatch) {\n    matchReasons =\n      `Manual review required: ${rows.length} candidate(s), ` +\n      `best score ${best.score}.`;\n  }\n}\n\nreturn [{\n  json: {\n    ...(best ? best.row : {}),\n    applicationId: prepared.applicationId || '',\n    senderEmail: prepared.senderEmail || '',\n    matchScore: best ? best.score : 0,\n    matchReasons,\n    candidateCount: rows.length,\n    safeMatch\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        96,
+        16
+      ],
+      "id": "a43701b8-d927-4bd2-b7c5-22f48c63bc62",
+      "name": "Safe Match Application"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bcece5c4-4ef6-4203-b274-0fc5baad15b9",
+              "leftValue": "={{ $json.safeMatch }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        320,
+        -176
+      ],
+      "id": "7653390e-7602-4d1e-bcff-752a2a99f8a9",
+      "name": "Safe Match?"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Gmail Message ID": "={{ $('Gmail Trigger').item.json.id }}",
+            "Date": "={{ $now.toISODate() }}",
+            "Sender": "={{ $('Edit Fields').first().json.senderEmail }}",
+            "Subject": "={{ $('Gmail Trigger').first().json.Subject || $('Gmail Trigger').first().json.subject || '' }}",
+            "Email Preview": "={{ $('Gmail Trigger').first().json.snippet || $('Gmail Trigger').first().json.Snippet || '' }}",
+            "Suggested Application ID": "={{ $('Edit Fields').first().json.applicationId }}",
+            "Company": "={{ $('Safe Match Application').first().json['Client / Company'] || '' }}",
+            "Match Score": "={{ $('Safe Match Application').first().json.matchScore ?? 0 }}",
+            "Candidates": "={{ $('Safe Match Application').first().json.candidateCount ?? 0 }}",
+            "Reason": "={{ $('Safe Match Application').first().json.matchReasons ?? '' }}",
+            "Reviewed": "No"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Sender",
+              "displayName": "Sender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subject",
+              "displayName": "Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email Preview",
+              "displayName": "Email Preview",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Suggested Application ID",
+              "displayName": "Suggested Application ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Match Score",
+              "displayName": "Match Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Candidates",
+              "displayName": "Candidates",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reason",
+              "displayName": "Reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reviewed",
+              "displayName": "Reviewed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Gmail Message ID",
+              "displayName": "Gmail Message ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        544,
+        176
+      ],
+      "id": "572940a1-10ab-4265-aedc-9dca460ef0e7",
+      "name": "Append row in sheet",
+      "notes": "After importing, select your spreadsheet and its 'Needs Review' tab.",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7b610f75-04b3-43ac-ad00-36e410995f2a",
+              "leftValue": "={{ $json[\"Gmail Message ID\"] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        720,
+        208
+      ],
+      "id": "750d051b-dd66-4728-880f-3809af40a24a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ecadf9db-3711-4c92-9646-0f629242c6f8",
+              "leftValue": "={{ $json[\"Reviewed\"] }}",
+              "rightValue": "No",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        944,
+        192
+      ],
+      "id": "5cadb331-97e3-4d50-87ad-08ff28c1951a",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "834f5ab5-7000-4246-8fd8-a2d6e470868d",
+              "leftValue": "={{ $json.detectedStatus }}",
+              "rightValue": "Interview",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "85b892b1-22f0-416d-9ada-c606e523da94",
+              "leftValue": "={{ $json.detectedStatus }}",
+              "rightValue": "Offer",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "c5c8082b-39c9-4d73-9452-bba604f12c20",
+              "leftValue": "={{ $json.detectedStatus }}",
+              "rightValue": "Replied",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "df61c91d-3570-4dd5-915f-55215dd13231",
+              "leftValue": "={{ $json.detectedStatus }}",
+              "rightValue": "Rejected",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        720,
+        -112
+      ],
+      "id": "289507a3-3328-41cc-83dc-07e906295a7b",
+      "name": "Important Status?"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "",
+          "mode": "list"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Gmail Message ID",
+              "lookupValue": "={{ $('Gmail Trigger').first().json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -320,
+        -224
+      ],
+      "id": "bcd36cd2-f1fb-4c6e-9d14-a0179db5bc4c",
+      "name": "Get row(s) in sheet1",
+      "alwaysOutputData": true,
+      "notes": "After importing, select your spreadsheet and its 'Needs Review' tab.",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f2a6abc4-e5b6-4ac4-a0c2-06c566a20978",
+              "leftValue": "={{ $json[\"Gmail Message ID\"] ?? \"\" }}",
+              "rightValue": "exists",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -144,
+        -64
+      ],
+      "id": "0471e1cb-6757-4e7b-9759-cdd67da74f3d",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "",
+          "mode": "list"
+        },
+        "filtersUI": {
+          "values": []
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -128,
+        240
+      ],
+      "id": "3f796cb5-2c25-4620-9023-23a44525eb82",
+      "name": "Get Candidate Applications",
+      "notes": "After importing, select your spreadsheet and its 'Applications' tab.",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "sendTo": "your-email@example.com",
+        "subject": "={{ \"Manual Review Required — \" + $json[\"Company\"] + \" — \" + $json[\"Suggested Application ID\"] }}",
+        "emailType": "text",
+        "message": "={{ `FREELANCE APPLICATION — MANUAL REVIEW REQUIRED  Application ID: ${$json[\"Suggested Application ID\"]} Company: ${$json[\"Company\"]} Subject: ${$json[\"Subject\"]} Match Score: ${$json[\"Match Score\"]} Candidate Matches: ${$json[\"Candidates\"]} Match Reason: ${$json[\"Reason\"]}  Email Preview: ${$json[\"Email Preview\"]}  Reviewed: ${$json[\"Reviewed\"]}  ACTION REQUIRED: Open your Freelance Tracker Google Sheet. Go to the Needs Review tab. Review this application and update its status.` }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1168,
+        96
+      ],
+      "id": "f7c2b701-ec97-4739-b682-9335cae5d264",
+      "name": "Send a message"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "",
+          "mode": "list"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Gmail Message ID",
+              "lookupValue": "={{ $('Gmail Trigger').first().json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -624,
+        -256
+      ],
+      "id": "e4041018-50a0-4048-bb16-bff755c3cf54",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": true,
+      "notes": "After importing, select your spreadsheet and its 'Needs Review' tab.",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a108502d-8a17-4a62-bd71-aba1b572712d",
+              "leftValue": "={{ $json[\"Gmail Message ID\"] ?? \"\" }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -656,
+        272
+      ],
+      "id": "573a041c-8ae6-4d96-b075-e8c43205f411",
+      "name": "Already in Needs Review?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "473feec3-2d46-4950-a97b-e25778fa27e5",
+              "leftValue": "={{ $json[\"Gmail Message ID\"] ?? \"\" }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -672,
+        0
+      ],
+      "id": "cf646587-ac3e-436b-b9ae-d5febe0cd569",
+      "name": "Duplicate Gmail ID?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c58550f0-eebc-4b32-a20f-3749d5554db8",
+              "leftValue": "={{ $json[\"Status\"] }}",
+              "rightValue": "=^(Rejected|Withdrawn|Accepted)$",
+              "operator": {
+                "type": "string",
+                "operation": "notRegex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        48,
+        448
+      ],
+      "id": "28b595ea-0ca6-4f20-a9bb-cc28d4ae53ef",
+      "name": "Application Still Active?"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Application ID": "={{ $json[\"applicationId\"] }}",
+            "Status": "={{ $('Edit Fields').first().json.detectedStatus }}",
+            "Last Contact": "={{ $now.setZone('America/Asuncion').toFormat('yyyy-MM-dd') }}"
+          },
+          "matchingColumns": [
+            "Application ID"
+          ],
+          "schema": [
+            {
+              "id": "Application ID",
+              "displayName": "Application ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Client / Company",
+              "displayName": "Client / Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Project / Role",
+              "displayName": "Project / Role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Contact Info",
+              "displayName": "Contact Info",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last Contact",
+              "displayName": "Last Contact",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        848,
+        400
+      ],
+      "id": "83cdb679-4968-4a4a-aa96-0d3ac0c985f0",
+      "name": "Update Application Status",
+      "notes": "After importing, select your spreadsheet and its 'Applications' tab.",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "fb406bbb-4e17-489e-bae2-a5079d3edb04",
+              "leftValue": "={{ \n  ['Interview', 'Rejected'].includes(\n    $('Edit Fields').first().json.detectedStatus\n  ) &&\n  $('Edit Fields').first().json.detectedStatus !== $json.Status\n}}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        320,
+        432
+      ],
+      "id": "bd63b249-5e72-454b-86f8-585270c9eca0",
+      "name": "Safe Status Change?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9455905f-5d6b-4247-9c94-1e5db56e4a5c",
+              "leftValue": "={{\n  ['Interview', 'Rejected'].includes(\n    $('Edit Fields').first().json.detectedStatus\n  ) &&\n  $('Edit Fields').first().json.detectedStatus === $json.Status\n}}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        544,
+        688
+      ],
+      "id": "74ba9c5f-8b93-4c75-b910-99463d82a36e",
+      "name": "Same Recognized Status?"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Application ID": "={{ $json.applicationId }}",
+            "Last Contact": "={{ $now.setZone('America/Asuncion').toFormat('yyyy-MM-dd') }}"
+          },
+          "matchingColumns": [
+            "Application ID"
+          ],
+          "schema": [
+            {
+              "id": "Application ID",
+              "displayName": "Application ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Client / Company",
+              "displayName": "Client / Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Project / Role",
+              "displayName": "Project / Role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Contact Info",
+              "displayName": "Contact Info",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Last Contact",
+              "displayName": "Last Contact",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        880,
+        672
+      ],
+      "id": "dc4db754-a321-4609-b4dc-32d62119b87d",
+      "name": "Update Last Contact Only",
+      "notes": "After importing, select your spreadsheet and its 'Applications' tab.",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "sendTo": "your-email@example.com",
+        "subject": "=Freelance Tracker - {{ $json[\"Application ID\"] }} - {{ $json[\"Status\"] }}",
+        "message": "=<h2>Freelance Application Status Update</h2>  <p><strong>Application ID:</strong> {{ $json[\"Application ID\"] }}</p>  <p><strong>Company:</strong> {{ $('Safe Match Application').first().json[\"Client / Company\"] }}</p>  <p><strong>New Status:</strong> {{ $json[\"Status\"] }}</p>  <p><strong>Last Contact:</strong> {{ $json[\"Last Contact\"] }}</p>  <hr> <p>Notification generated automatically by n8n.</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1072,
+        400
+      ],
+      "id": "a5261c28-2221-4c57-8c2b-f3e57c6364f4",
+      "name": "Send Status Notification"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Email": {
+      "main": [
+        [
+          {
+            "node": "Important Status?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Safe Match Application": {
+      "main": [
+        [
+          {
+            "node": "Application Still Active?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Safe Match?": {
+      "main": [
+        [
+          {
+            "node": "Classify Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Important Status?": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get Candidate Applications",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Candidate Applications": {
+      "main": [
+        [
+          {
+            "node": "Safe Match Application",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Duplicate Gmail ID?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Already in Needs Review?": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Duplicate Gmail ID?": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Already in Needs Review?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Application Still Active?": {
+      "main": [
+        [
+          {
+            "node": "Safe Status Change?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Safe Status Change?": {
+      "main": [
+        [
+          {
+            "node": "Update Application Status",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Same Recognized Status?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Same Recognized Status?": {
+      "main": [
+        [
+          {
+            "node": "Update Last Contact Only",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Application Status": {
+      "main": [
+        [
+          {
+            "node": "Send Status Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "nodeGroups": [],
+  "tags": []
+}
